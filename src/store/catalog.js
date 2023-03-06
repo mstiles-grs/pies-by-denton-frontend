@@ -9,11 +9,11 @@ export const useCatalog = defineStore('catalog-store', {
   },
 
   getters: {
-    results(state) {
+    results: state => {
       return state.newArrivals;
     },
 
-    isFetching(state) {
+    isFetching: state => {
       return state.fetching;
     }
   },

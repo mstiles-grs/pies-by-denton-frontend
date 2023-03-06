@@ -1,5 +1,11 @@
-<script setup>
-import NavBar from './components/nav-bar.vue'
+<script>
+import { defineComponent } from 'vue'
+
+export default defineComponent({
+  components: {
+    NavBar: () => import('./components/nav-bar.vue'),
+  },
+})
 </script>
 
 <template>

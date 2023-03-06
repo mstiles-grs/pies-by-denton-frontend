@@ -1,43 +1,78 @@
 <script>
-import TopNavbar from '../../components/nav-bar.vue'
+import { ref } from 'vue'
+import axios from '@/axios.js'
+
+import TopNavbar from '@/components/nav-bar.vue'
+
 export default {
   components: {
     TopNavbar,
   },
 
-  data() {
-    return {
-      imageSrc: 'https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp',
-    };
-  },
-
-  mounted() {
-    const password = document.getElementById("password");
-    const passwordConfirm = document.getElementById("password-confirm");
-    const passwordMatch = document.getElementById("password-match");
-    const passwordMismatch = document.getElementById("password-mismatch");
+  setup() {
+    const first_name = ref('')
+    const last_name = ref('')
+    const user_name = ref('')
+    const email = ref('')
+    const password = ref('')
+    const passwordConfirm = ref('')
+    const passwordMatch = ref(false)
+    const submitting = ref(false)
+    const error = ref('')
 
     const checkPasswordMatch = () => {
-      if (password.value === passwordConfirm.value) {
-        password.style.backgroundColor = "rgba(39, 245, 76, 0.38)";
-        passwordConfirm.style.backgroundColor = "rgba(39, 245, 76, 0.38)";
-        passwordMatch.classList.remove("hidden");
-        passwordMismatch.classList.add("hidden");
-      } else {
-        password.style.backgroundColor = "rgba(245, 39, 39, 0.38)";
-        passwordConfirm.style.backgroundColor = "rgba(245, 39, 39, 0.38)";
-        passwordMatch.classList.add("hidden");
-        passwordMismatch.classList.remove("hidden");
-      }
-    };
+      passwordMatch.value = password.value === passwordConfirm.value
+    }
 
-    password.addEventListener("keyup", checkPasswordMatch);
-    passwordConfirm.addEventListener("keyup", checkPasswordMatch);
-  }
+    const registerUser = async () => {
+      error.value = ''
+      submitting.value = true
+
+
+
+      try {
+        const response = await axios.post('/create/user', {
+          first_name: first_name.value,
+          last_name: last_name.value,
+          user_name: user_name.value,
+          email: email.value,
+          password: password.value,
+        })
+
+        console.log('yes dude!',response.data)
+
+        // reset form fields and state
+        first_name.value = ''
+        last_name.value = ''
+        user_name.value = ''
+        email.value = ''
+        password.value = ''
+        passwordConfirm.value = ''
+        passwordMatch.value = false
+        submitting.value = false
+      } catch (err) {
+        console.error(err)
+        error.value = err.message
+        submitting.value = false
+      }
+    }
+
+    return {
+      first_name,
+      last_name,
+      user_name,
+      email,
+      password,
+      passwordConfirm,
+      passwordMatch,
+      submitting,
+      error,
+      checkPasswordMatch,
+      registerUser,
+    }
+  },
 }
 </script>
-
-
 
 <template>
   <div>
@@ -59,36 +94,50 @@ export default {
           <form>
             <div class="mb-4">
               <label class="block text-gray-700 font-bold mb-2" for="name">
-                Your Name
+                Your First Name
               </label>
-              <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="John Doe">
+              <input v-model="first_name" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="John">
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-bold mb-2" for="name">
+                Your Last Name
+              </label>
+              <input v-model="last_name" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Doe">
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-gray-700 font-bold mb-2" for="name">
+                User Name
+              </label>
+              <input v-model="user_name" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" placeholder="Mr_J_D">
             </div>
 
             <div class="mb-4">
               <label class="block text-gray-700 font-bold mb-2" for="email">
                 Your Email
               </label>
-              <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="johndoe@example.com">
+              <input v-model="email" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="email" placeholder="johndoe@example.com">
             </div>
 
             <div class="mb-4">
               <label class="block text-gray-700 font-bold mb-2" for="password">
                 Password
               </label>
-              <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="password" type="password" placeholder="Password">
+              <input v-model="password" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="password" type="password" placeholder="Password" @input="checkPasswordMatch">
             </div>
             <div class="mb-4">
               <label class="block text-gray-700 font-bold mb-2" for="password-confirm">
                 Confirm Password
               </label>
-              <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="password-confirm" type="password" placeholder="Confirm Password">
-              <span id="password-match" class="hidden text-sm text-green-500 mt-1">Passwords match!</span>
-              <span id="password-mismatch" class="hidden text-sm text-red-500 mt-1">Passwords do not match.</span>
+              <input v-model="passwordConfirm" class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="password-confirm" type="password" placeholder="Confirm Password" @input="checkPasswordMatch">
+            <span v-if="passwordMatch" class="text-sm text-green-500 mt-1">Passwords match!</span>
+            <span v-if="!passwordMatch" class="text-sm text-red-500 mt-1">Passwords do not match.</span>
             </div>
             <div class="flex justify-center">
-              <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+              <button @click.prevent="registerUser" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                 Register
               </button>
             </div>
