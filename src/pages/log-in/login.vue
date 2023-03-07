@@ -1,4 +1,51 @@
+<script>
+import { ref } from 'vue';
+import axios from '@/axios.js'
+import TopNavbar from '@/components/nav-bar.vue'
+
+export default {
+  components: {
+    TopNavbar,
+  },
+
+
+  setup() {
+    const email = ref('');
+    const password = ref('');
+
+    const login = async () => {
+  try {
+    const response = await axios.post('/login/user', {
+      email: email.value,
+      password: password.value,
+    })
+
+    if(response.data.message === '200') {
+          // Navigate the user to the dashboard
+          //TODO Create the Dashboard page
+          router.push('/dashboard');
+        } else {
+          // Handle invalid login
+          //TODO: Figure out if I want a pop up or a message near the bottom of Log in.
+        }
+
+    // reset form fields and state
+    email.value = ''
+    password.value = ''
+  } catch (err) {
+    console.error(err)
+  }
+}
+    return { email, password, login };
+  },
+};
+</script>
+
+
 <template>
+  <div>
+    <TopNavbar />
+  </div>
   <div class="flex flex-col h-screen">
     <div class="flex flex-col md:flex-row h-screen">
       <div class="bg-pink-600 text-white py-32 px-10 md:w-1/2 relative overflow-hidden">
@@ -24,6 +71,7 @@
               Email
             </label>
             <input
+            v-model="email"
               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="email"
               type="email"
@@ -35,6 +83,7 @@
               Password
             </label>
             <input
+              v-model="password"
               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="password"
               type="password"
@@ -45,7 +94,8 @@
             <button
               class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="button"
-            >
+              @click="login"
+              >
               Sign In
             </button>
             <a
@@ -61,23 +111,7 @@
   </div>
 </template>
 
-  <script>
-  import { ref } from 'vue';
 
-  export default {
-    setup() {
-      const email = ref('');
-      const password = ref('');
-
-      const login = () => {
-        // Handle login logic here
-        console.log('Logging in...');
-      };
-
-      return { email, password, login };
-    },
-  };
-  </script>
 
   <style>
 
