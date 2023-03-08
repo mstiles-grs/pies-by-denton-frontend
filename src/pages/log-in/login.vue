@@ -1,41 +1,41 @@
 <script>
 import { ref } from 'vue';
-import axios from '@/axios.js'
-import TopNavbar from '@/components/nav-bar.vue'
+import axios from '@/axios.js';
+import router from '@/pages/routes';
+import TopNavbar from '@/components/nav-bar.vue';
 
 export default {
   components: {
     TopNavbar,
   },
-
-
   setup() {
     const email = ref('');
     const password = ref('');
 
     const login = async () => {
-  try {
-    const response = await axios.post('/login/user', {
-      email: email.value,
-      password: password.value,
-    })
+      try {
+        const response = await axios.post('/login/user', {
+          email: email.value,
+          password: password.value,
+        });
 
-    if(response.data.message === '200') {
+        console.log('response', response);
+
+        if (response.status === 200) {
           // Navigate the user to the dashboard
-          //TODO Create the Dashboard page
-          router.push('/dashboard');
+          router.push('/dashboard/');
         } else {
           // Handle invalid login
-          //TODO: Figure out if I want a pop up or a message near the bottom of Log in.
+          // TODO: Figure out if I want a pop up or a message near the bottom of Log in.
         }
 
-    // reset form fields and state
-    email.value = ''
-    password.value = ''
-  } catch (err) {
-    console.error(err)
-  }
-}
+        // reset form fields and state
+        email.value = '';
+        password.value = '';
+      } catch (err) {
+        console.error(err);
+      }
+    };
     return { email, password, login };
   },
 };
