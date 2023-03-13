@@ -13,28 +13,27 @@ export default {
     const password = ref('');
 
     const login = async () => {
-      try {
-        const response = await axios.post('/login/user', {
-          email: email.value,
-          password: password.value,
-        });
+  try {
+    const response = await axios.post('/login/user', {
+      email: email.value,
+      password: password.value,
+    });
 
-        console.log('response', response);
+    if (response.status === 200) {
 
-        if (response.status === 200) {
-          // Navigate the user to the dashboard
-          router.push('/dashboard/');
-        } else {
-          // Handle invalid login
-          // TODO: Figure out if I want a pop up or a message near the bottom of Log in.
-        }
+      // Navigate the user to the dashboard
+      router.push('/dashboard/');
+    } else {
+      // Handle invalid login
+      // TODO: Figure out if I want a pop up or a message near the bottom of Log in.
+    }
 
-        // reset form fields and state
-        email.value = '';
-        password.value = '';
-      } catch (err) {
-        console.error(err);
-      }
+    // reset form fields and state
+    email.value = '';
+    password.value = '';
+  } catch (err) {
+    console.error(err);
+  }
     };
     return { email, password, login };
   },
@@ -46,6 +45,7 @@ export default {
   <div>
     <TopNavbar />
   </div>
+
   <div class="flex flex-col h-screen">
     <div class="flex flex-col md:flex-row h-screen">
       <div class="bg-pink-600 text-white py-32 px-10 md:w-1/2 relative overflow-hidden">
